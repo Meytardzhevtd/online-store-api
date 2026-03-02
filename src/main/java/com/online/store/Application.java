@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class Application {
 
-    @GetMapping("/")
-    public String hello() {
-        return "Hello, Online Store API!";
-    }
+	@GetMapping("/")
+	public String hello() {
+		return "Hello, Online Store API!";
+	}
 
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(Application.class, args);
+	}
 }

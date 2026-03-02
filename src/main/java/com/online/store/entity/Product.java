@@ -16,23 +16,19 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "products")
 public class Product {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(name = "title", nullable = false)
-    private String title;
+	@Column(name = "title", nullable = false)
+	private String title;
 
-    @Column(name = "description")
-    private String descriprion;
+	@Column(name = "description")
+	private String descriprion;
 
-    @Column(name = "price", nullable = false)
-    private double price;
+	@Column(name = "price", nullable = false)
+	private double price;
 
-    @Column(name = "quantity", nullable = false)
-    private Integer quantity;
-
-    /**
-     * Id does not change
-     */
+	@Column(name = "quantity", nullable = false)
+	private Integer quantity;
 }

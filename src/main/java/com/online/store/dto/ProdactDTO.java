@@ -8,12 +8,12 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProdactDTO {
-    private String title;
-    private String description;
-    private double price;
-    private Integer quantity;
+	private String title;
+	private String description;
+	private double price;
+	private Integer quantity;
 
-    public Product toProduct() {
-        return new Product(null, title, description, price, quantity);
-    }
+	public Product toProduct() {
+		return new Product(null, title, description, price, quantity);
+	}
 }
