@@ -35,10 +35,4 @@ public class Product {
     /**
      * Id does not change
      */
-    public void update(Product otherProduct) {
-        this.title = otherProduct.title;
-        this.descriprion = otherProduct.descriprion;
-        this.price = otherProduct.price;
-        this.quantity = otherProduct.quantity;
-    }
 }

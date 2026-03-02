@@ -34,7 +34,10 @@ public class ProductService {
         Optional<Product> optionalProduct = productRepository.findById(productId);
         if (optionalProduct.isPresent()) {
             Product product = optionalProduct.get();
-            product.update(productDto.toProduct());
+            product.setTitle(productDto.getTitle());
+            product.setPrice(productDto.getPrice());
+            product.setDescriprion(productDto.getDescription());
+            product.setQuantity(productDto.getQuantity());
             Product saved = productRepository.save(product);
             return saved;
         } else {
