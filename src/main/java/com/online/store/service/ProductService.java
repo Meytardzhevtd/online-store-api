@@ -3,12 +3,14 @@ package com.online.store.service;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.online.store.dto.ProdactDTO;
 import com.online.store.entity.Product;
 import com.online.store.repository.ProductRepository;
 
 @Service
+@Transactional(readOnly = true)
 public class ProductService {
     public final ProductRepository productRepository;
 
@@ -17,6 +19,7 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
+    @Transactional
     public Product create(ProdactDTO productDto) {
         Product saved = productRepository.save(productDto.toProduct());
         return saved;
@@ -26,6 +29,7 @@ public class ProductService {
         return productRepository.findById(productId);
     }
 
+    @Transactional
     public Product update(Long productId, ProdactDTO productDto) {
         Optional<Product> optionalProduct = productRepository.findById(productId);
         if (optionalProduct.isPresent()) {
@@ -38,6 +42,7 @@ public class ProductService {
         }
     }
 
+    @Transactional
     public void buy(Long productId) {
         Optional<Product> optionalProduct = productRepository.findById(productId);
         if (optionalProduct.isPresent()) {
@@ -48,9 +53,12 @@ public class ProductService {
             }
             product.setQuantity(quantity - 1);
             productRepository.save(product);
+        } else {
+            throw new RuntimeException("This product not found");
         }
     }
 
+    @Transactional
     public void delete(Long productId) {
         Optional<Product> optionalProduct = productRepository.findById(productId);
         if (optionalProduct.isPresent()) {
