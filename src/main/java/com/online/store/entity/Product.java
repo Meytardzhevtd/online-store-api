@@ -31,4 +31,14 @@ public class Product {
 
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
+
+    /**
+     * Id does not change
+     */
+    public void update(Product otherProduct) {
+        this.title = otherProduct.title;
+        this.descriprion = otherProduct.descriprion;
+        this.price = otherProduct.price;
+        this.quantity = otherProduct.quantity;
+    }
 }
