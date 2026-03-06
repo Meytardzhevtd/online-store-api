@@ -1,5 +1,7 @@
 package com.online.store.entity;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -27,7 +29,7 @@ public class Product {
 	private String descriprion;
 
 	@Column(name = "price", nullable = false)
-	private Double price;
+	private BigDecimal price;
 
 	@Column(name = "quantity", nullable = false)
 	private Integer quantity;
