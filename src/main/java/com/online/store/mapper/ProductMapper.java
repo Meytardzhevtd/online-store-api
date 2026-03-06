@@ -10,5 +10,7 @@ import com.online.store.entity.Product;
 public interface ProductMapper {
 	Product toEntity(ProductRequest dto);
 
+	Product toEntityFromProductResponse(ProductResponse dto);
+
 	ProductResponse toResponse(Product entity);
 }

@@ -23,14 +23,21 @@ public class ProductService {
 		this.productMapper = productMapper;
 	}
 
-	
-
 	@Transactional
 	public ProductResponse create(ProductRequest request) {
 		Product saved = productRepository.save(productMapper.toEntity(request));
 		return productMapper.toResponse(saved);
 	}
-	
+
+	@Transactional
+	public ProductResponse update(ProductResponse request) {
+		Product product = productRepository.findById(request.getId())
+				.orElseThrow(() -> new ProductNotFoundException(request.getId()));
+
+		product = productMapper.toEntityFromProductResponse(request);
+		Product saved = productRepository.save(product);
+		return productMapper.toResponse(saved);
+	}
 
 	public ProductResponse get(Long productId) {
 		Product product = productRepository.findById(productId)
