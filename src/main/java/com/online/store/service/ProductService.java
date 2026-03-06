@@ -4,9 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.online.store.dto.product.ProductCreate;
+import com.online.store.dto.product.ProductRequest;
 import com.online.store.dto.product.ProductResponse;
 import com.online.store.entity.Product;
+import com.online.store.exceptions.ProductNotFoundException;
 import com.online.store.mapper.ProductMapper;
 import com.online.store.repository.ProductRepository;
 
@@ -22,9 +23,26 @@ public class ProductService {
 		this.productMapper = productMapper;
 	}
 
-	ProductResponse create(ProductCreate request) {
+	
+
+	@Transactional
+	public ProductResponse create(ProductRequest request) {
 		Product saved = productRepository.save(productMapper.toEntity(request));
 		return productMapper.toResponse(saved);
+	}
+	
+
+	public ProductResponse get(Long productId) {
+		Product product = productRepository.findById(productId)
+				.orElseThrow(() -> new ProductNotFoundException(productId));
+		return productMapper.toResponse(product);
+	}
+
+	@Transactional
+	public void delete(Long productId) {
+		Product product = productRepository.findById(productId)
+				.orElseThrow(() -> new ProductNotFoundException(productId));
+		productRepository.delete(product);
 	}
 
 }
