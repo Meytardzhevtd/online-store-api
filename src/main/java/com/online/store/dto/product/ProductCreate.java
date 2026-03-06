@@ -6,8 +6,8 @@ import lombok.Data;
 
 @Data
 public class ProductCreate {
-    private String title;
-    private String description;
-    private BigDecimal price;
-    private Integer quantity;
+	private String title;
+	private String description;
+	private BigDecimal price;
+	private Integer quantity;
 }

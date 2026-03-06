@@ -1,5 +1,14 @@
 package com.online.store.mapper;
 
-public interface ProductMapper {
+import org.mapstruct.Mapper;
 
+import com.online.store.dto.product.ProductCreate;
+import com.online.store.dto.product.ProductResponse;
+import com.online.store.entity.Product;
+
+@Mapper(componentModel = "string")
+public interface ProductMapper {
+	Product toEntity(ProductCreate dto);
+
+	ProductResponse toResponse(Product entity);
 }
