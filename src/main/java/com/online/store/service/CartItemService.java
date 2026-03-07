@@ -47,7 +47,7 @@ public class CartItemService {
 	}
 
 	@Transactional
-	public void setProduct(CartRequest request) {
+	public void update(CartRequest request) {
 		User user = userRepository.findById(request.getUserId())
 				.orElseThrow(() -> new UserNotFoundException(request.getUserId()));
 		Product product = productRepository.findById(request.getProductId())
@@ -57,10 +57,11 @@ public class CartItemService {
 			CartItem cartItem = cartItemRepository.findByUserAndProduct(user, product)
 					.orElseThrow(() -> new CartItemNotFoundEexception(user.getId(), product.getId()));
 
-			cartItem.setQuantity(cartItem.getQuantity() + request.getQuantity());
+			cartItem.setQuantity(cartItem.getQuantity());
 		} else {
 			cartItemRepository.save(new CartItem(null, user, product, request.getQuantity()));
 		}
 
 	}
+
 }

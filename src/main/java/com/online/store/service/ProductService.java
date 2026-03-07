@@ -1,5 +1,8 @@
 package com.online.store.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +30,14 @@ public class ProductService {
 	public ProductResponse create(ProductRequest request) {
 		Product saved = productRepository.save(productMapper.toEntity(request));
 		return productMapper.toResponse(saved);
+	}
+
+	public List<ProductResponse> getAllProducts() {
+		return productRepository
+				.findAll()
+				.stream()
+				.map((product) -> productMapper.toResponse(product))
+				.collect(Collectors.toList());
 	}
 
 	@Transactional
