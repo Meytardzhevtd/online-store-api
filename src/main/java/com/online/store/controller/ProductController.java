@@ -21,40 +21,40 @@ import com.online.store.service.ProductService;
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {
-    private final ProductService productService;
+	private final ProductService productService;
 
-    @Autowired
-    public ProductController(ProductService productService) {
-        this.productService = productService;
-    }
+	@Autowired
+	public ProductController(ProductService productService) {
+		this.productService = productService;
+	}
 
-    @PostMapping
-    public ResponseEntity<ProductResponse> create(@RequestBody ProductRequest request) {
-        ProductResponse saved = productService.create(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
-    }
+	@PostMapping
+	public ResponseEntity<ProductResponse> create(@RequestBody ProductRequest request) {
+		ProductResponse saved = productService.create(request);
+		return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+	}
 
-    @GetMapping
-    public ResponseEntity<List<ProductResponse>> getAllProducts() {
-        return ResponseEntity.status(HttpStatus.OK).body(productService.getAllProducts());
-    }
+	@GetMapping
+	public ResponseEntity<List<ProductResponse>> getAllProducts() {
+		return ResponseEntity.status(HttpStatus.OK).body(productService.getAllProducts());
+	}
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ProductResponse> get(@PathVariable Long id) {
-        return ResponseEntity.ok(productService.get(id));
-    }
+	@GetMapping("/{id}")
+	public ResponseEntity<ProductResponse> get(@PathVariable Long id) {
+		return ResponseEntity.ok(productService.get(id));
+	}
 
-    @PutMapping
-    public ResponseEntity<ProductResponse> update(@RequestBody ProductResponse requsest) {
-        // ProductResponse -- используется, потому что удобно. Не образать внимание на
-        // название
-        ProductResponse response = productService.update(requsest);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
+	@PutMapping
+	public ResponseEntity<ProductResponse> update(@RequestBody ProductResponse requsest) {
+		// ProductResponse -- используется, потому что удобно. Не образать внимание на
+		// название
+		ProductResponse response = productService.update(requsest);
+		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
 
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        productService.delete(id);
-    }
+	@DeleteMapping("/{id}")
+	public void delete(@PathVariable Long id) {
+		productService.delete(id);
+	}
 
 }

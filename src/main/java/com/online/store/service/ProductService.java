@@ -33,11 +33,8 @@ public class ProductService {
 	}
 
 	public List<ProductResponse> getAllProducts() {
-		return productRepository
-				.findAll()
-				.stream()
-				.map((product) -> productMapper.toResponse(product))
-				.collect(Collectors.toList());
+		return productRepository.findAll().stream()
+				.map((product) -> productMapper.toResponse(product)).collect(Collectors.toList());
 	}
 
 	@Transactional

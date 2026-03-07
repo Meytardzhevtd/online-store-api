@@ -54,8 +54,8 @@ public class CartItemService {
 				.orElseThrow(() -> new ProductNotFoundException(request.getProductId()));
 
 		if (cartItemRepository.existsByUserAndProduct(user, product)) {
-			CartItem cartItem = cartItemRepository.findByUserAndProduct(user, product)
-					.orElseThrow(() -> new CartItemNotFoundEexception(user.getId(), product.getId()));
+			CartItem cartItem = cartItemRepository.findByUserAndProduct(user, product).orElseThrow(
+					() -> new CartItemNotFoundEexception(user.getId(), product.getId()));
 
 			cartItem.setQuantity(cartItem.getQuantity());
 		} else {
