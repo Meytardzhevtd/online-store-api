@@ -1,1 +1,1 @@
-![Java CI with Maven](https://github.com/meytardzhevtd/online-store-api/actions/workflows/maven-tests.yml/badge.svg)
+![tests](https://github.com/meytardzhevtd/online-store-api/actions/workflows/maven-tests.yml/badge.svg)
