@@ -32,6 +32,11 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
         <!-- Mockito обычно идет внутри spring-boot-starter-test, 
          но можно добавить явно, если нужны расширенные функции -->
         <dependency>

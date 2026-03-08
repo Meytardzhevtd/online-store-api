@@ -1,5 +1,7 @@
 package com.online.store.entity;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -28,5 +30,8 @@ public class User {
 
 	@Column(name = "password", nullable = false)
 	private String password;
+
+	@Column(name = "balance", precision = 19, scale = 4, nullable = false)
+	private BigDecimal balance = BigDecimal.ZERO;
 
 }
