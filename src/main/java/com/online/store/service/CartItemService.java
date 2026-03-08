@@ -57,7 +57,7 @@ public class CartItemService {
 			CartItem cartItem = cartItemRepository.findByUserAndProduct(user, product).orElseThrow(
 					() -> new CartItemNotFoundEexception(user.getId(), product.getId()));
 
-			cartItem.setQuantity(cartItem.getQuantity());
+			cartItem.setQuantity(request.getQuantity());
 		} else {
 			cartItemRepository.save(new CartItem(null, user, product, request.getQuantity()));
 		}
