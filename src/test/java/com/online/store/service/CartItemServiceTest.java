@@ -32,169 +32,169 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class CartItemServiceTest {
 
-    @Mock
-    private CartItemRepository cartItemRepository;
+	@Mock
+	private CartItemRepository cartItemRepository;
 
-    @Mock
-    private UserRepository userRepository;
+	@Mock
+	private UserRepository userRepository;
 
-    @Mock
-    private CartMapper cartMapper;
+	@Mock
+	private CartMapper cartMapper;
 
-    @Mock
-    private ProductRepository productRepository;
+	@Mock
+	private ProductRepository productRepository;
 
-    @InjectMocks
-    private CartItemService cartItemService;
+	@InjectMocks
+	private CartItemService cartItemService;
 
-    private User testUser;
-    private Product testProduct;
-    private CartItem existingCartItem;
-    private CartRequest newProductRequest;
-    private CartRequest updateQuantityRequest;
-    private CartResponse cartResponse;
+	private User testUser;
+	private Product testProduct;
+	private CartItem existingCartItem;
+	private CartRequest newProductRequest;
+	private CartRequest updateQuantityRequest;
+	private CartResponse cartResponse;
 
-    @BeforeEach
-    void setUp() {
-        testUser = new User();
-        testUser.setId(1L);
-        testUser.setName("test_user");
+	@BeforeEach
+	void setUp() {
+		testUser = new User();
+		testUser.setId(1L);
+		testUser.setName("test_user");
 
-        testProduct = new Product();
-        testProduct.setId(1L);
-        testProduct.setTitle("Test Product");
-        testProduct.setPrice(BigDecimal.valueOf(100.0));
-        testProduct.setQuantity(10);
+		testProduct = new Product();
+		testProduct.setId(1L);
+		testProduct.setTitle("Test Product");
+		testProduct.setPrice(BigDecimal.valueOf(100.0));
+		testProduct.setQuantity(10);
 
-        existingCartItem = new CartItem(1L, testUser, testProduct, 5);
+		existingCartItem = new CartItem(1L, testUser, testProduct, 5);
 
-        newProductRequest = new CartRequest(1L, 99L, 2);
+		newProductRequest = new CartRequest(1L, 99L, 2);
 
-        updateQuantityRequest = new CartRequest(1L, 1L, 10);
+		updateQuantityRequest = new CartRequest(1L, 1L, 10);
 
-        cartResponse = new CartResponse(1L, 5);
-    }
+		cartResponse = new CartResponse(1L, 5);
+	}
 
-    @Test
-    @DisplayName("Should return list of cart items for existing user")
-    void testGetCart_Success() {
-        List<CartItem> mockCartItems = Arrays.asList(existingCartItem);
+	@Test
+	@DisplayName("Should return list of cart items for existing user")
+	void testGetCart_Success() {
+		List<CartItem> mockCartItems = Arrays.asList(existingCartItem);
 
-        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
-        when(cartItemRepository.findAllByUser(testUser)).thenReturn(mockCartItems);
-        when(cartMapper.toCartResponse(existingCartItem)).thenReturn(cartResponse);
+		when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+		when(cartItemRepository.findAllByUser(testUser)).thenReturn(mockCartItems);
+		when(cartMapper.toCartResponse(existingCartItem)).thenReturn(cartResponse);
 
-        List<CartResponse> result = cartItemService.getCart(1L);
+		List<CartResponse> result = cartItemService.getCart(1L);
 
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(5, result.get(0).getQuantity());
+		assertNotNull(result);
+		assertEquals(1, result.size());
+		assertEquals(5, result.get(0).getQuantity());
 
-        verify(userRepository).findById(1L);
-        verify(cartItemRepository).findAllByUser(testUser);
-        verify(cartMapper).toCartResponse(existingCartItem);
-    }
+		verify(userRepository).findById(1L);
+		verify(cartItemRepository).findAllByUser(testUser);
+		verify(cartMapper).toCartResponse(existingCartItem);
+	}
 
-    @Test
-    @DisplayName("Should throw UserNotFoundException when user not found in getCart")
-    void testGetCart_UserNotFound() {
-        when(userRepository.findById(999L)).thenReturn(Optional.empty());
+	@Test
+	@DisplayName("Should throw UserNotFoundException when user not found in getCart")
+	void testGetCart_UserNotFound() {
+		when(userRepository.findById(999L)).thenReturn(Optional.empty());
 
-        assertThrows(UserNotFoundException.class, () -> cartItemService.getCart(999L));
+		assertThrows(UserNotFoundException.class, () -> cartItemService.getCart(999L));
 
-        verify(userRepository).findById(999L);
-        verify(cartItemRepository, never()).findAllByUser(any());
-    }
+		verify(userRepository).findById(999L);
+		verify(cartItemRepository, never()).findAllByUser(any());
+	}
 
-    @Test
-    @DisplayName("Should create new CartItem when product is not in cart")
-    void testUpdate_CreateNewItem() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
-        when(productRepository.findById(99L)).thenReturn(Optional.of(testProduct));
+	@Test
+	@DisplayName("Should create new CartItem when product is not in cart")
+	void testUpdate_CreateNewItem() {
+		when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+		when(productRepository.findById(99L)).thenReturn(Optional.of(testProduct));
 
-        when(cartItemRepository.existsByUserAndProduct(testUser, testProduct)).thenReturn(false);
+		when(cartItemRepository.existsByUserAndProduct(testUser, testProduct)).thenReturn(false);
 
-        when(cartItemRepository.save(any(CartItem.class))).thenAnswer(invocation -> {
-            CartItem item = invocation.getArgument(0);
-            item.setId(999L);
-            return item;
-        });
+		when(cartItemRepository.save(any(CartItem.class))).thenAnswer(invocation -> {
+			CartItem item = invocation.getArgument(0);
+			item.setId(999L);
+			return item;
+		});
 
-        cartItemService.update(newProductRequest);
+		cartItemService.update(newProductRequest);
 
-        verify(cartItemRepository, times(1)).save(any(CartItem.class));
+		verify(cartItemRepository, times(1)).save(any(CartItem.class));
 
-        verify(cartItemRepository, never()).findByUserAndProduct(any(), any());
-    }
+		verify(cartItemRepository, never()).findByUserAndProduct(any(), any());
+	}
 
-    @Test
-    @DisplayName("Should update quantity correctly (Catches the logic bug)")
-    void testUpdate_LogicCheck() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
-        when(productRepository.findById(1L)).thenReturn(Optional.of(testProduct));
-        when(cartItemRepository.existsByUserAndProduct(testUser, testProduct)).thenReturn(true);
+	@Test
+	@DisplayName("Should update quantity correctly (Catches the logic bug)")
+	void testUpdate_LogicCheck() {
+		when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+		when(productRepository.findById(1L)).thenReturn(Optional.of(testProduct));
+		when(cartItemRepository.existsByUserAndProduct(testUser, testProduct)).thenReturn(true);
 
-        when(cartItemRepository.findByUserAndProduct(testUser, testProduct))
-                .thenReturn(Optional.of(existingCartItem));
+		when(cartItemRepository.findByUserAndProduct(testUser, testProduct))
+				.thenReturn(Optional.of(existingCartItem));
 
-        int newQuantity = 10;
-        CartRequest request = new CartRequest(1L, 1L, newQuantity);
+		int newQuantity = 10;
+		CartRequest request = new CartRequest(1L, 1L, newQuantity);
 
-        cartItemService.update(request);
+		cartItemService.update(request);
 
-        assertEquals(newQuantity, existingCartItem.getQuantity(),
-                "Количество должно обновиться до значения из запроса!");
-    }
+		assertEquals(newQuantity, existingCartItem.getQuantity(),
+				"Количество должно обновиться до значения из запроса!");
+	}
 
-    @Test
-    @DisplayName("Should update quantity when product already exists in cart")
-    void testUpdate_UpdateExistingItem() {
+	@Test
+	@DisplayName("Should update quantity when product already exists in cart")
+	void testUpdate_UpdateExistingItem() {
 
-        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
-        when(productRepository.findById(1L)).thenReturn(Optional.of(testProduct));
-        when(cartItemRepository.existsByUserAndProduct(testUser, testProduct)).thenReturn(true);
-        when(cartItemRepository.findByUserAndProduct(testUser, testProduct))
-                .thenReturn(Optional.of(existingCartItem));
+		when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+		when(productRepository.findById(1L)).thenReturn(Optional.of(testProduct));
+		when(cartItemRepository.existsByUserAndProduct(testUser, testProduct)).thenReturn(true);
+		when(cartItemRepository.findByUserAndProduct(testUser, testProduct))
+				.thenReturn(Optional.of(existingCartItem));
 
-        cartItemService.update(updateQuantityRequest);
-        verify(cartItemRepository, never()).save(any());
-        verify(cartItemRepository).findByUserAndProduct(testUser, testProduct);
-    }
+		cartItemService.update(updateQuantityRequest);
+		verify(cartItemRepository, never()).save(any());
+		verify(cartItemRepository).findByUserAndProduct(testUser, testProduct);
+	}
 
-    @Test
-    @DisplayName("Should throw UserNotFoundException in update if user missing")
-    void testUpdate_UserNotFound() {
-        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+	@Test
+	@DisplayName("Should throw UserNotFoundException in update if user missing")
+	void testUpdate_UserNotFound() {
+		when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(UserNotFoundException.class, () -> cartItemService.update(newProductRequest));
+		assertThrows(UserNotFoundException.class, () -> cartItemService.update(newProductRequest));
 
-        verify(productRepository, never()).findById(any());
-        verify(cartItemRepository, never()).existsByUserAndProduct(any(), any());
-    }
+		verify(productRepository, never()).findById(any());
+		verify(cartItemRepository, never()).existsByUserAndProduct(any(), any());
+	}
 
-    @Test
-    @DisplayName("Should throw ProductNotFoundException in update if product missing")
-    void testUpdate_ProductNotFound() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
-        when(productRepository.findById(99L)).thenReturn(Optional.empty());
+	@Test
+	@DisplayName("Should throw ProductNotFoundException in update if product missing")
+	void testUpdate_ProductNotFound() {
+		when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+		when(productRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(ProductNotFoundException.class,
-                () -> cartItemService.update(newProductRequest));
+		assertThrows(ProductNotFoundException.class,
+				() -> cartItemService.update(newProductRequest));
 
-        verify(cartItemRepository, never()).existsByUserAndProduct(any(), any());
-    }
+		verify(cartItemRepository, never()).existsByUserAndProduct(any(), any());
+	}
 
-    @Test
-    @DisplayName("Should throw CartItemNotFoundEexception if exists returns true but find returns empty")
-    void testUpdate_RaceConditionScenario() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
-        when(productRepository.findById(1L)).thenReturn(Optional.of(testProduct));
+	@Test
+	@DisplayName("Should throw CartItemNotFoundEexception if exists returns true but find returns empty")
+	void testUpdate_RaceConditionScenario() {
+		when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+		when(productRepository.findById(1L)).thenReturn(Optional.of(testProduct));
 
-        when(cartItemRepository.existsByUserAndProduct(testUser, testProduct)).thenReturn(true);
-        when(cartItemRepository.findByUserAndProduct(testUser, testProduct))
-                .thenReturn(Optional.empty());
+		when(cartItemRepository.existsByUserAndProduct(testUser, testProduct)).thenReturn(true);
+		when(cartItemRepository.findByUserAndProduct(testUser, testProduct))
+				.thenReturn(Optional.empty());
 
-        assertThrows(CartItemNotFoundEexception.class,
-                () -> cartItemService.update(updateQuantityRequest));
-    }
+		assertThrows(CartItemNotFoundEexception.class,
+				() -> cartItemService.update(updateQuantityRequest));
+	}
 }
