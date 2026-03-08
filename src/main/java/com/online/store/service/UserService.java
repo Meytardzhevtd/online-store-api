@@ -20,41 +20,42 @@ import com.online.store.mapper.UserMapper;
 @Service
 @Transactional(readOnly = true)
 public class UserService {
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final UserMapper userMapper;
+	private final UserRepository userRepository;
+	private final PasswordEncoder passwordEncoder;
+	private final UserMapper userMapper;
 
-    @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserMapper userMapper) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.userMapper = userMapper;
-    }
+	@Autowired
+	public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
+			UserMapper userMapper) {
+		this.userRepository = userRepository;
+		this.passwordEncoder = passwordEncoder;
+		this.userMapper = userMapper;
+	}
 
-    @Transactional
-    public UserResponse register(UserRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new UserAlreadyExistsException(request.getEmail());
-        }
-        User user = new User(null, request.getName(), request.getEmail(),
-                passwordEncoder.encode(request.getPassword()), BigDecimal.ZERO);
+	@Transactional
+	public UserResponse register(UserRequest request) {
+		if (userRepository.existsByEmail(request.getEmail())) {
+			throw new UserAlreadyExistsException(request.getEmail());
+		}
+		User user = new User(null, request.getName(), request.getEmail(),
+				passwordEncoder.encode(request.getPassword()), BigDecimal.ZERO);
 
-        return userMapper.toResponse(user);
-    }
+		return userMapper.toResponse(user);
+	}
 
-    public boolean login(LoginRequest request) {
-        Optional<User> oUser = userRepository.findByEmail(request.getEmail());
-        if (oUser.isPresent()) {
-            return passwordEncoder.matches(oUser.get().getPassword(), request.getPassword());
-        } else {
-            return false;
-        }
-    }
+	public boolean login(LoginRequest request) {
+		Optional<User> oUser = userRepository.findByEmail(request.getEmail());
+		if (oUser.isPresent()) {
+			return passwordEncoder.matches(oUser.get().getPassword(), request.getPassword());
+		} else {
+			return false;
+		}
+	}
 
-    public UserResponse getUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+	public UserResponse getUser(Long userId) {
+		User user = userRepository.findById(userId)
+				.orElseThrow(() -> new UserNotFoundException(userId));
 
-        return userMapper.toResponse(user);
-    }
+		return userMapper.toResponse(user);
+	}
 }

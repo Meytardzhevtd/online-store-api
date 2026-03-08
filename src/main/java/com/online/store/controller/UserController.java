@@ -16,21 +16,21 @@ import com.online.store.service.UserService;
 @RestController
 @RequestMapping("api/users")
 public class UserController {
-    private final UserService userService;
+	private final UserService userService;
 
-    @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
+	@Autowired
+	public UserController(UserService userService) {
+		this.userService = userService;
+	}
 
-    @PostMapping("/register")
-    public ResponseEntity<UserResponse> register(@RequestBody UserRequest request) {
-        UserResponse response = userService.register(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
+	@PostMapping("/register")
+	public ResponseEntity<UserResponse> register(@RequestBody UserRequest request) {
+		UserResponse response = userService.register(request);
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+	}
 
-    @PostMapping("/login")
-    public void login(@RequestBody LoginRequest request) {
-        // TODO
-    }
+	@PostMapping("/login")
+	public void login(@RequestBody LoginRequest request) {
+		// TODO
+	}
 }

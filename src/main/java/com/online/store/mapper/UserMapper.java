@@ -7,6 +7,6 @@ import com.online.store.entity.User;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
-    UserResponse toResponse(User user);
+	UserResponse toResponse(User user);
 
 }
