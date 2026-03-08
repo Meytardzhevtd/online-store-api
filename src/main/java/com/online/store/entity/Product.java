@@ -32,6 +32,9 @@ public class Product {
 	@Column(name = "quantity", nullable = false)
 	private Integer quantity;
 
+	@Column(name = "views_count")
+	private Long viewsCount = 0L;
+
 	public static Product build(String title, String descriprion, BigDecimal price,
 			Integer quantity) {
 		Product product = new Product();
