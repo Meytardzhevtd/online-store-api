@@ -19,7 +19,6 @@ class Node {
 
 	public Node() {
 		this.count = new LongAdder();
-		this.count.increment();
 		this.lastAccess = System.currentTimeMillis();
 	}
 
@@ -32,8 +31,6 @@ class Node {
 		return count.sum();
 	}
 
-	// Метод, который забирает сумму и обнуляет счетчик (важно для flush без
-	// удаления!)
 	public long sumThenReset() {
 		return count.sumThenReset();
 	}
@@ -48,11 +45,11 @@ public class ConcurrentViewCounter {
 	private final ConcurrentHashMap<Long, Node> map = new ConcurrentHashMap<>();
 	private final LongAdder globalCounter = new LongAdder();
 
-	private static final long MAX_TIME_LAST_ACCESS_MS = 60_000L; // 1 минута (для теста, потом 10
-																	// мин)
+	private static final long MAX_TIME_LAST_ACCESS_MS = 60_000L; // 1 минута
 	private static final long MAX_COUNT_THRESHOLD = 1_000L; // 1000 просмотров
-	private static final long MAX_OPERATIONS_BEFORE_FLUSH = 100_000L; // Лимит операций до
-																		// принудительного прохода
+
+	// Лимит операций до принудительного прохода
+	private static final long MAX_OPERATIONS_BEFORE_FLUSH = 100_000L;
 
 	private final ProductRepository productRepository;
 
