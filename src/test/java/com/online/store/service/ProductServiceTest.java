@@ -34,6 +34,9 @@ class ProductServiceTest {
 	@Mock
 	private ProductMapper productMapper;
 
+	@Mock
+	private com.online.store.core.concurrent.ConcurrentViewCounter viewCounter;
+
 	@InjectMocks
 	private ProductService productService;
 
@@ -96,6 +99,7 @@ class ProductServiceTest {
 		assertEquals(productId, result.getId());
 		assertEquals("Test Laptop", result.getTitle());
 
+		verify(viewCounter).increment(productId);
 		verify(productRepository).findById(productId);
 		verify(productMapper).toResponse(productEntity);
 	}
@@ -109,6 +113,7 @@ class ProductServiceTest {
 		assertThrows(ProductNotFoundException.class, () -> productService.get(productId),
 				"Ожидалось выбрасывание ProductNotFoundException");
 
+		verify(viewCounter).increment(productId);
 		verify(productRepository, never()).save(any());
 		verify(productMapper, never()).toResponse(any());
 	}

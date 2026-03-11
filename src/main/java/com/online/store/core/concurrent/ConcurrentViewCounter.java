@@ -45,10 +45,9 @@ public class ConcurrentViewCounter {
 	private final ConcurrentHashMap<Long, Node> map = new ConcurrentHashMap<>();
 	private final LongAdder globalCounter = new LongAdder();
 
-	private static final long MAX_TIME_LAST_ACCESS_MS = 60_000L; // 1 минута
-	private static final long MAX_COUNT_THRESHOLD = 1_000L; // 1000 просмотров
+	private static final long MAX_TIME_LAST_ACCESS_MS = 60_000L;
+	private static final long MAX_COUNT_THRESHOLD = 1_000L;
 
-	// Лимит операций до принудительного прохода
 	private static final long MAX_OPERATIONS_BEFORE_FLUSH = 100_000L;
 
 	private final ProductRepository productRepository;
@@ -64,14 +63,17 @@ public class ConcurrentViewCounter {
 
 		globalCounter.increment();
 
-		if (globalCounter.sum() >= MAX_OPERATIONS_BEFORE_FLUSH) {
-			flush();
-			globalCounter.reset();
+		long current = globalCounter.sum();
+		if (current >= MAX_OPERATIONS_BEFORE_FLUSH) {
+			long drained = globalCounter.sumThenReset();
+			if (drained >= MAX_OPERATIONS_BEFORE_FLUSH) {
+				flush();
+			}
 		}
 	}
 
 	@Transactional
-	private void flush() {
+	public void flush() {
 		long now = System.currentTimeMillis();
 		Iterator<Map.Entry<Long, Node>> iterator = map.entrySet().iterator();
 
