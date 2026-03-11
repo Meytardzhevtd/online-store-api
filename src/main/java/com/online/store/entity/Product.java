@@ -8,12 +8,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
-@AllArgsConstructor
+// @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "products")
@@ -33,4 +31,17 @@ public class Product {
 
 	@Column(name = "quantity", nullable = false)
 	private Integer quantity;
+
+	@Column(name = "views_count")
+	private Long viewsCount = 0L;
+
+	public static Product build(String title, String descriprion, BigDecimal price,
+			Integer quantity) {
+		Product product = new Product();
+		product.setTitle(title);
+		product.setDescriprion(descriprion);
+		product.setPrice(price);
+		product.setQuantity(quantity);
+		return product;
+	}
 }

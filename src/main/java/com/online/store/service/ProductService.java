@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.online.store.core.concurrent.ConcurrentViewCounter;
 import com.online.store.dto.product.ProductRequest;
 import com.online.store.dto.product.ProductResponse;
 import com.online.store.entity.Product;
@@ -19,11 +20,14 @@ import com.online.store.repository.ProductRepository;
 public class ProductService {
 	public final ProductRepository productRepository;
 	private final ProductMapper productMapper;
+	private final ConcurrentViewCounter viewCounter;
 
 	@Autowired
-	public ProductService(ProductRepository productRepository, ProductMapper productMapper) {
+	public ProductService(ProductRepository productRepository, ProductMapper productMapper,
+			ConcurrentViewCounter viewCounter) {
 		this.productRepository = productRepository;
 		this.productMapper = productMapper;
+		this.viewCounter = viewCounter;
 	}
 
 	@Transactional
@@ -48,6 +52,7 @@ public class ProductService {
 	}
 
 	public ProductResponse get(Long productId) {
+		viewCounter.increment(productId);
 		Product product = productRepository.findById(productId)
 				.orElseThrow(() -> new ProductNotFoundException(productId));
 		return productMapper.toResponse(product);

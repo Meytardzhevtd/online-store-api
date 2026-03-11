@@ -17,6 +17,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,6 +33,9 @@ class ProductServiceTest {
 
 	@Mock
 	private ProductMapper productMapper;
+
+	@Mock
+	private com.online.store.core.concurrent.ConcurrentViewCounter viewCounter;
 
 	@InjectMocks
 	private ProductService productService;
@@ -93,6 +99,7 @@ class ProductServiceTest {
 		assertEquals(productId, result.getId());
 		assertEquals("Test Laptop", result.getTitle());
 
+		verify(viewCounter).increment(productId);
 		verify(productRepository).findById(productId);
 		verify(productMapper).toResponse(productEntity);
 	}
@@ -106,6 +113,7 @@ class ProductServiceTest {
 		assertThrows(ProductNotFoundException.class, () -> productService.get(productId),
 				"Ожидалось выбрасывание ProductNotFoundException");
 
+		verify(viewCounter).increment(productId);
 		verify(productRepository, never()).save(any());
 		verify(productMapper, never()).toResponse(any());
 	}
@@ -162,5 +170,63 @@ class ProductServiceTest {
 		verify(productRepository).findById(productId);
 		verify(productRepository).delete(productEntity);
 		verify(productRepository, times(1)).delete(productEntity);
+	}
+
+	@Test
+	@DisplayName("Should return all products when repository has items")
+	void testGetAllProducts_ReturnsList() {
+		when(productRepository.findAll()).thenReturn(Arrays.asList(productEntity));
+		when(productMapper.toResponse(productEntity)).thenReturn(response);
+
+		List<ProductResponse> results = productService.getAllProducts();
+
+		assertNotNull(results);
+		assertEquals(1, results.size());
+		assertEquals(1L, results.get(0).getId());
+		assertEquals("Test Laptop", results.get(0).getTitle());
+
+		verify(productRepository).findAll();
+		verify(productMapper).toResponse(productEntity);
+	}
+
+	@Test
+	@DisplayName("Should return empty list when no products")
+	void testGetAllProducts_Empty() {
+		when(productRepository.findAll()).thenReturn(Collections.emptyList());
+
+		List<ProductResponse> results = productService.getAllProducts();
+
+		assertNotNull(results);
+		assertTrue(results.isEmpty());
+
+		verify(productRepository).findAll();
+		verify(productMapper, never()).toResponse(any());
+	}
+
+	@Test
+	@DisplayName("Should throw ProductNotFoundException when updating non-existent product")
+	void testUpdateProduct_NotFound() {
+		ProductResponse updateRequest = new ProductResponse();
+		updateRequest.setId(42L);
+
+		when(productRepository.findById(42L)).thenReturn(Optional.empty());
+
+		assertThrows(ProductNotFoundException.class, () -> productService.update(updateRequest));
+
+		verify(productRepository).findById(42L);
+		verify(productMapper, never()).toEntityFromProductResponse(any());
+		verify(productRepository, never()).save(any());
+	}
+
+	@Test
+	@DisplayName("Should throw ProductNotFoundException when deleting non-existent product")
+	void testDeleteProduct_NotFound() {
+		Long productId = 999L;
+		when(productRepository.findById(productId)).thenReturn(Optional.empty());
+
+		assertThrows(ProductNotFoundException.class, () -> productService.delete(productId));
+
+		verify(productRepository).findById(productId);
+		verify(productRepository, never()).delete(any());
 	}
 }
