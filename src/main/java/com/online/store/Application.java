@@ -10,7 +10,7 @@ public class Application {
 
 	@GetMapping("/")
 	public String hello() {
-		return "Hello, Online Store API!";
+		return "Привет";
 	}
 
 	public static void main(String[] args) {
